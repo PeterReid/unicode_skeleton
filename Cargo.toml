@@ -1,0 +1,7 @@
+[package]
+name = "unicode_unconfuse"
+version = "0.1.0"
+authors = ["Peter Reid <peter@peterreid.net>"]
+
+[dependencies]
+unicode-normalization = "0.1.5"

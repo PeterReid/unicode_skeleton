@@ -1,0 +1,7 @@
+/target/
+**/*.rs.bk
+Cargo.lock
+
+data/confusables_to_data.exe
+data/confusables_to_data.pdb
+data/confusables_to_data
