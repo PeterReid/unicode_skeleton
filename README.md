@@ -23,5 +23,5 @@ Adding the following to your `Cargo.toml` to use:
 
 ```toml
 [dependencies]
-unicode_skeleton = "0.1.0"
+unicode_skeleton = "0.1.1"
 ```
