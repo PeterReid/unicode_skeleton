@@ -1,4 +1,4 @@
-// Copyright 2017 Peter Reid. See the COPYRIGHT file at the top-level
+// Copyright 2017 Peter Reid. See the COPYRIGHT
 // directory of this distribution.
 //
 // Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
@@ -35,6 +35,7 @@ extern crate unicode_normalization;
 use std::char;
 use std::iter::FlatMap;
 use std::slice;
+use std::str::Chars;
 use std::option;
 
 use unicode_normalization::Decompositions;
@@ -76,11 +77,11 @@ type DecomposeSingleChar = Decompositions<option::IntoIter<char>>;
 
 /// Test if two strings have the same "skeleton", and thus could be visually
 /// confused for each another.
-pub fn confusable<A, B>(a: A, b: B) -> bool
-    where A: IntoIterator<Item=char>, B: IntoIterator<Item=char>
+pub fn confusable<A, B, AI, BI>(a: A, b: B) -> bool
+    where A: UnicodeSkeleton<AI>, B: UnicodeSkeleton<BI>, AI: Iterator<Item=char>, BI: Iterator<Item=char>
 {
-    let mut skeleton_a = skeleton_chars(a);
-    let mut skeleton_b = skeleton_chars(b);
+    let mut skeleton_a = a.skeleton_chars();
+    let mut skeleton_b = b.skeleton_chars();
 
     loop {
         match (skeleton_a.next(), skeleton_b.next()) {
@@ -98,7 +99,7 @@ pub fn confusable<A, B>(a: A, b: B) -> bool
 
 /// An iterator over the characters of the skeleton of a unicode string.
 /// This is retrieved via the `UnicodeSkeleton` trait.
-pub struct SkeletonChars<I>(
+pub struct SkeletonChars<I: Iterator<Item=char>>(
     FlatMap<DecompositionsToPrototypeChars<I>, DecomposeSingleChar, fn(char) -> Decompositions<option::IntoIter<char>>>
 );
 
@@ -120,29 +121,40 @@ impl<I: Iterator<Item=char>> SkeletonChars<I> {
     }
 }
 
-/// Create an `Iterator` over the chararacters of the skeleton of the provided string.
-///
-/// # Examples
-/// ```Rust
-/// skeleton_chars("𝔭𝒶ỿ𝕡𝕒ℓ").collect::<String>(); // "paypal"
-/// skeleton_chars(['𝒶', '𝒷', '𝒸']).collect::<String>();  "abc"
-/// ```   
-pub fn skeleton_chars<I: IntoIterator<Item=char>>(i: I) -> SkeletonChars<I::IntoIter> {
-    SkeletonChars::new(i.into_iter())
+/// Method for retrieving a `SkeletonChars` from a `str` or other `char` iterator.
+pub trait UnicodeSkeleton<I: Iterator<Item=char>> {
+    /// Retrieve an iterater of the characters of the provided char sequence's skeleton
+    ///
+    /// # Examples
+    /// ```Rust
+    /// "𝔭𝒶ỿ𝕡𝕒ℓ".skeleton_chars().collect::<String>(); // "paypal"
+    /// ['𝒶', '𝒷', '𝒸'].iter().map(|c| *c).collect::<String>();  "abc"
+    fn skeleton_chars(self) -> SkeletonChars<I>;
 }
 
+impl<I: Iterator<Item=char>> UnicodeSkeleton<I> for I {
+    fn skeleton_chars(self) -> SkeletonChars<I> {
+        SkeletonChars::new(self)
+    }
+}
+
+impl<'a> UnicodeSkeleton<Chars<'a>> for &'a str {
+    fn skeleton_chars(self) -> SkeletonChars<Chars<'a>> {
+        SkeletonChars::new(self.chars())
+    }
+}
 
 #[cfg(test)]
 mod tests {
-    use super::{skeleton_chars, confusable};
+    use super::{UnicodeSkeleton, confusable};
 
     #[test]
     fn skeleton_char_cases() {
-        assert_eq!(skeleton_chars("\u{0441}").collect::<String>(), "\u{0063}");
-        assert_eq!(skeleton_chars("𝔭𝒶ỿ𝕡𝕒ℓ").collect::<String>(), "paypal");
-        assert_eq!(skeleton_chars("ℝ𝓊𝓈𝓉").collect::<String>(), "Rust");
+        assert_eq!("\u{0441}".skeleton_chars().collect::<String>(), "\u{0063}");
+        assert_eq!("𝔭𝒶ỿ𝕡𝕒ℓ".skeleton_chars().collect::<String>(), "paypal");
+        assert_eq!("ℝ𝓊𝓈𝓉".skeleton_chars().collect::<String>(), "Rust");
 
-        assert_eq!(skeleton_chars(['𝒶', '𝒷', '𝒸']).collect::<String>(), "abc");
+        assert_eq!(['𝒶', '𝒷', '𝒸'].iter().map(|c| *c).skeleton_chars().collect::<String>(), "abc");
     }
 
     #[test]
