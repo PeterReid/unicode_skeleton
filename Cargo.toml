@@ -1,7 +1,11 @@
 [package]
-name = "unicode_unconfuse"
+name = "unicode_skeleton"
 version = "0.1.0"
 authors = ["Peter Reid <peter@peterreid.net>"]
+exclude = [
+    "data/*",
+]
 
 [dependencies]
 unicode-normalization = "0.1.5"
+
