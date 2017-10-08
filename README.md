@@ -8,10 +8,10 @@ compare as equal.
 ```rust
 extern crate unicode_skeleton;
 
-use unicode_skeleton::{skeleton_chars, confusable};
+use unicode_skeleton::{UnicodeSkeleton, confusable};
 
 fn main() {
-    assert_eq!(skeleton_chars("𝔭𝒶ỿ𝕡𝕒ℓ").collect::<String>(), "paypal");
+    assert_eq!("𝔭𝒶ỿ𝕡𝕒ℓ".skeleton_chars().collect::<String>(), "paypal");
     assert!(confusable("ℝ𝓊𝓈𝓉", "Rust"));
 }
 ```
