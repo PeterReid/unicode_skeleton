@@ -158,6 +158,13 @@ mod tests {
     }
 
     #[test]
+    fn final_table_entry() {
+        // The last character is a special case, since we don't have a next index to check.
+        // (Handled by the `unwrap_or` in `PrototypeCharsIterator::new`.)
+        assert_eq!("\u{2fa1d}".skeleton_chars().collect::<String>(), "𪘀");
+    }
+
+    #[test]
     fn confusables() {
         assert!(confusable("ℝ𝓊𝓈𝓉", "Rust"));
         assert!(!confusable("ℝ𝓊𝓈", "Rust"));
