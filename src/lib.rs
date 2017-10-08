@@ -165,6 +165,11 @@ mod tests {
     }
 
     #[test]
+    fn leave_intact() {
+        assert_eq!("Plain letters".skeleton_chars().collect::<String>(), "Plain letters");
+    }
+
+    #[test]
     fn confusables() {
         assert!(confusable("ℝ𝓊𝓈𝓉", "Rust"));
         assert!(!confusable("ℝ𝓊𝓈", "Rust"));
