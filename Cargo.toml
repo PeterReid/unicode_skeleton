@@ -5,7 +5,20 @@ authors = ["Peter Reid <peter@peterreid.net>"]
 exclude = [
     "data/*",
 ]
+license = "MIT/Apache-2.0"
+homepage = "https://github.com/PeterReid/unicode_skeleton"
+repository = "https://github.com/PeterReid/unicode_skeleton"
+documentation = "https://docs.rs/unicode_skeleton/*/unicode_skeleton"
+keywords = ["text", "unicode", "confusable", "skeleton"]
+
+description = """
+This crate detects unicode strings that look nearly
+identical once rendered, but do not compare as equal.
+It defines "confusable" and "skeleton" based on
+Unicode Standard Annex #39.
+"""
 
 [dependencies]
 unicode-normalization = "0.1.5"
+
 
